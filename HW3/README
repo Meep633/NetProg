@@ -1,0 +1,77 @@
+DV convergence:
+[R1] ROUTES (init):
+  network         mask            next_hop        cost
+  192.168.10.0    255.255.255.0   0.0.0.0         0
+[R1] ROUTES (dv-update):
+  network         mask            next_hop        cost
+  192.168.10.0    255.255.255.0   0.0.0.0         0
+  10.0.20.0       255.255.255.0   127.0.1.2       1
+[R1] ROUTES (dv-update):
+  network         mask            next_hop        cost
+  192.168.10.0    255.255.255.0   0.0.0.0         0
+  10.0.20.0       255.255.255.0   127.0.1.2       1
+  10.0.30.0       255.255.255.0   127.0.1.3       3
+[R1] ROUTES (dv-update):
+  network         mask            next_hop        cost
+  192.168.10.0    255.255.255.0   0.0.0.0         0
+  10.0.20.0       255.255.255.0   127.0.1.2       1
+  10.0.30.0       255.255.255.0   127.0.1.2       2
+
+[R2] ROUTES (init):
+  network         mask            next_hop        cost
+  10.0.20.0       255.255.255.0   0.0.0.0         0
+[R2] ROUTES (dv-update):
+  network         mask            next_hop        cost
+  10.0.20.0       255.255.255.0   0.0.0.0         0
+  192.168.10.0    255.255.255.0   127.0.1.1       1
+[R2] ROUTES (dv-update):
+  network         mask            next_hop        cost
+  10.0.20.0       255.255.255.0   0.0.0.0         0
+  192.168.10.0    255.255.255.0   127.0.1.1       1
+  10.0.30.0       255.255.255.0   127.0.1.3       1
+
+[R3] ROUTES (init):
+  network         mask            next_hop        cost
+  10.0.30.0       255.255.255.0   0.0.0.0         0
+[R3] ROUTES (dv-update):
+  network         mask            next_hop        cost
+  10.0.30.0       255.255.255.0   0.0.0.0         0
+  192.168.10.0    255.255.255.0   127.0.1.1       3
+[R3] ROUTES (dv-update):
+  network         mask            next_hop        cost
+  10.0.30.0       255.255.255.0   0.0.0.0         0
+  192.168.10.0    255.255.255.0   127.0.1.2       2
+  10.0.20.0       255.255.255.0   127.0.1.2       1
+
+LPM Forwarding:
+./sendpkt 12001 192.168.10.10 10.0.30.55 8 "hello LPM world"
+
+[R1] FWD dst=10.0.30.55 via=10.0.30.55 cost=2 ttl=7
+[R2] FWD dst=10.0.30.55 via=10.0.30.55 cost=1 ttl=6
+[R3] DELIVER connected dst=10.0.30.55 payload="hello LPM world"
+
+Neighbor Timeout:
+pkill -f "router configs/r2.conf"
+
+[R1] ROUTES (neighbor-dead):
+  network         mask            next_hop        cost
+  192.168.10.0    255.255.255.0   0.0.0.0         0
+  10.0.20.0       255.255.255.0   127.0.1.2       65535
+  10.0.30.0       255.255.255.0   127.0.1.2       65535
+[R1] ROUTES (dv-update):
+  network         mask            next_hop        cost
+  192.168.10.0    255.255.255.0   0.0.0.0         0
+  10.0.20.0       255.255.255.0   127.0.1.2       65535
+  10.0.30.0       255.255.255.0   127.0.1.3       3
+
+[R3] ROUTES (neighbor-dead):
+  network         mask            next_hop        cost
+  10.0.30.0       255.255.255.0   0.0.0.0         0
+  192.168.10.0    255.255.255.0   127.0.1.2       65535
+  10.0.20.0       255.255.255.0   127.0.1.2       65535
+[R3] ROUTES (dv-update):
+  network         mask            next_hop        cost
+  10.0.30.0       255.255.255.0   0.0.0.0         0
+  192.168.10.0    255.255.255.0   127.0.1.1       3
+  10.0.20.0       255.255.255.0   127.0.1.2       65535
+
